@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.felix.scr.impl.inject.ActivatorParameter;
@@ -42,6 +44,216 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
 {
 
     protected final boolean m_supportsInterfaces;
+    private static final HashMap<Class<?>, MethodInfo> classToMethodInfo = new HashMap<>();
+    private static final HashSet<String> sortedNullClasses = new HashSet<>(73);
+    private static final HashSet<String> nullClasses = new HashSet<>(130);
+    static {
+sortedNullClasses.add("com.ibm.ws.kernel.server.internal.ServerEndpointControlMBeanImpl");
+sortedNullClasses.add("javax.management.StandardMBean");
+sortedNullClasses.add("java.lang.Object");
+sortedNullClasses.add("com.ibm.ws.kernel.server.internal.ServerInfoMBeanImpl");
+sortedNullClasses.add("com.ibm.ws.kernel.filemonitor.internal.scan.ScanningCoreServiceImpl");
+sortedNullClasses.add("com.ibm.ws.kernel.filemonitor.internal.FileNotificationImpl");
+sortedNullClasses.add("com.ibm.ws.runtime.update.internal.RuntimeUpdateNotificationMBeanImpl");
+sortedNullClasses.add("javax.management.StandardEmitterMBean");
+sortedNullClasses.add("com.ibm.ws.event.internal.WorkStageExecutorServiceFactory");
+sortedNullClasses.add("com.ibm.ws.threading.PolicyExecutorProvider");
+sortedNullClasses.add("com.ibm.ws.threading.internal.ThreadingIntrospector");
+sortedNullClasses.add("com.ibm.ws.artifact.zip.cache.internal.ZipCachingServiceImpl");
+sortedNullClasses.add("com.ibm.ws.artifact.url.internal.WSJarURLStreamHandler");
+sortedNullClasses.add("org.osgi.service.url.AbstractURLStreamHandlerService");
+sortedNullClasses.add("java.net.URLStreamHandler");
+sortedNullClasses.add("com.ibm.wsloading.internal.ApplicationClassloadingServiceFactory");
+sortedNullClasses.add("com.ibm.wsloading.internal.ClassLoadingButlerAdapter");
+sortedNullClasses.add("com.ibm.ws.container.service.naming.RemoteObjectInstanceFactoryImpl");
+sortedNullClasses.add("com.ibm.wsloading.internal.NativeLibraryAdapter");
+sortedNullClasses.add("com.ibm.ws.managedobject.internal.ManagedObjectServiceImpl");
+sortedNullClasses.add("com.ibm.ws.event.internal.ScheduledEventServiceImpl");
+sortedNullClasses.add("com.ibm.ws.app.manager.ear.internal.EARDeployedAppInfoFactoryImpl");
+sortedNullClasses.add("com.ibm.ws.app.manager.module.AbstractDeployedAppInfoFactory");
+sortedNullClasses.add("com.ibm.ws.webserver.plugin.runtime.collaborators.GenPluginConfigCollaborator");
+sortedNullClasses.add("com.ibm.ws.webcontainer31.util.ServletInjectionClassListCollaborator");
+sortedNullClasses.add("com.ibm.ws.webcontainer40.osgi.container.config.factory.WebAppConfiguratorFactory40Impl");
+sortedNullClasses.add("com.ibm.ws.jaxrs20.client.component.JaxRsAppSecurity");
+sortedNullClasses.add("com.ibm.ws.jaxrs20.server.component.JaxRsBeanValidation");
+sortedNullClasses.add("com.ibm.ws.webcontainer40.async.factory.AsyncContextFactory40Impl");
+sortedNullClasses.add("com.ibm.ws.webcontainer40.servlet.factory.CacheServletWrapperFactory40Impl");
+sortedNullClasses.add("com.ibm.ws.webcontainer40.osgi.srt.factory.SRTConnectionContextPool40Impl");
+sortedNullClasses.add("com.ibm.ws.webcontainer40.osgi.response.factory.IRequestResponseFactory40Impl");
+sortedNullClasses.add("com.ibm.wsspi.webcontainer40.util.factory.URIMatcherFactory40Impl");
+sortedNullClasses.add("com.ibm.ws.webcontainer40.osgi.webapp.factory.WebAppFactory40Impl");
+sortedNullClasses.add("com.ibm.ws.app.manager.web.internal.WebModuleHandlerImpl");
+sortedNullClasses.add("com.ibm.ws.app.manager.module.internal.ModuleHandlerBase");
+sortedNullClasses.add("com.ibm.ws.app.manager.war.internal.WARDeployedAppInfoFactoryImpl");
+sortedNullClasses.add("com.ibm.ws.app.manager.war.internal.WARApplicationHandlerImpl");
+sortedNullClasses.add("com.ibm.ws.jaxrs20.web.JaxRsInjectionClassListCollaborator");
+sortedNullClasses.add("com.ibm.ws.cxf.client.component.AsyncClientRunnableWrapperManager");
+sortedNullClasses.add("org.eclipse.yasson.JsonBindingProvider");
+sortedNullClasses.add("javax.json.bind.spi.JsonbProvider");
+sortedNullClasses.add("com.ibm.ws.jndi.internal.WASInitialContextFactoryBuilder");
+sortedNullClasses.add("org.glassfish.json.JsonProviderImpl");
+sortedNullClasses.add("javax.json.spi.JsonProvider");
+sortedNullClasses.add("com.ibm.ws.cdi.web.impl.el.WrappedELExpressionFactory");
+sortedNullClasses.add("javax.el.ExpressionFactory");
+sortedNullClasses.add("com.ibm.ws.jaxrs20.component.LibertySseFeature");
+sortedNullClasses.add("com.ibm.ws.jaxrs20.providers.customexceptionmapper.CustomExceptionMapperRegister");
+sortedNullClasses.add("com.ibm.ws.jaxrs20.providers.security.SecurityAnnoProviderRegister");
+sortedNullClasses.add("com.ibm.ws.transaction.services.TransactionObjectFactoryInfo");
+sortedNullClasses.add("com.ibm.wsspi.injectionengine.ObjectFactoryInfo");
+sortedNullClasses.add("com.ibm.ws.transaction.services.TransactionSynchronizationRegistryObjectFactoryInfo");
+sortedNullClasses.add("com.ibm.ws.adaptable.module.internal.NonPersistentCacheContainerAdapter");
+sortedNullClasses.add("com.ibm.ws.javaee.ddmodel.permissions.PermissionsAdapter");
+sortedNullClasses.add("com.ibm.ws.javaee.ddmodel.web.WebAppAdapter");
+sortedNullClasses.add("com.ibm.ws.javaee.ddmodel.webbnd.WebBndAdapter");
+sortedNullClasses.add("com.ibm.ws.javaee.ddmodel.webext.WebExtAdapter");
+sortedNullClasses.add("com.ibm.ws.cdi.web.liberty.WeldConfiguratorHelperFactory");
+sortedNullClasses.add("com.ibm.ws.container.service.config.internal.WebFragmentsInfoAdapter");
+sortedNullClasses.add("com.ibm.ws.container.service.app.deploy.internal.WebModuleClassesInfoAdapter");
+sortedNullClasses.add("com.ibm.ws.adaptable.module.internal.FastModeControlContainerAdapter");
+sortedNullClasses.add("com.ibm.ws.adaptable.module.internal.NonPersistentCacheEntryAdapter");
+sortedNullClasses.add("com.ibm.wsspi.webcontainer.webapp.WebAppConfigAdapter");
+sortedNullClasses.add("com.ibm.ws.cdi.liberty.CDIDeferredMetaDataFactoryImpl");
+sortedNullClasses.add("com.ibm.tx.jta.cdi.TransactionContextExtension");
+sortedNullClasses.add("com.ibm.ws.javaee.ddmodel.managedbean.ManagedBeanBndAdapter");
+sortedNullClasses.add("com.ibm.ws.webcontainer40.session.impl.factory.SessionContextRegistryImplFactory40Impl");
+sortedNullClasses.add("com.ibm.ws.webcontainer.osgi.session.SessionHelper");
+sortedNullClasses.add("com.ibm.ws.cdi.web.liberty.WeldServletInitializer");
+sortedNullClasses.add("com.ibm.ws.classloading.internal.ApplicationClassloadingServiceFactory");
+sortedNullClasses.add("com.ibm.ws.classloading.internal.ClassLoadingButlerAdapter");
+sortedNullClasses.add("com.ibm.ws.classloading.internal.NativeLibraryAdapter");
+
+nullClasses.add("com.ibm.tx.jta.UserTransactionFactory");
+nullClasses.add("com.ibm.tx.jta.cdi.TransactionContextExtension");
+nullClasses.add("com.ibm.tx.jta.embeddable.impl.EmbeddableTMHelper");
+nullClasses.add("com.ibm.tx.jta.util.TxTMHelper");
+nullClasses.add("com.ibm.webservices.handler.impl.GlobalHandlerServiceImpl");
+nullClasses.add("com.ibm.websphere.channelfw.osgi.CHFWBundle");
+nullClasses.add("com.ibm.ws.adaptable.module.internal.AdapterFactoryServiceImpl");
+nullClasses.add("com.ibm.ws.adaptable.module.internal.FastModeControlContainerAdapter");
+nullClasses.add("com.ibm.ws.adaptable.module.internal.NonPersistentCacheContainerAdapter");
+nullClasses.add("com.ibm.ws.adaptable.module.internal.NonPersistentCacheEntryAdapter");
+nullClasses.add("com.ibm.ws.anno.service.internal.AnnotationServiceImpl_Service");
+nullClasses.add("com.ibm.ws.app.manager.ApplicationManager");
+nullClasses.add("com.ibm.ws.app.manager.ear.internal.EARDeployedAppInfoFactoryImpl");
+nullClasses.add("com.ibm.ws.app.manager.internal.monitor.AppMonitorConfigurator");
+nullClasses.add("com.ibm.ws.app.manager.internal.monitor.ApplicationMonitor");
+nullClasses.add("com.ibm.ws.app.manager.module.AbstractDeployedAppInfoFactory");
+nullClasses.add("com.ibm.ws.app.manager.module.internal.ModuleHandlerBase");
+nullClasses.add("com.ibm.ws.app.manager.war.internal.WARApplicationHandlerImpl");
+nullClasses.add("com.ibm.ws.app.manager.war.internal.WARDeployedAppInfoFactoryImpl");
+nullClasses.add("com.ibm.ws.app.manager.web.internal.WebModuleHandlerImpl");
+nullClasses.add("com.ibm.ws.artifact.internal.ArtifactContainerFactoryService");
+nullClasses.add("com.ibm.ws.artifact.url.internal.WSJarURLStreamHandler");
+nullClasses.add("com.ibm.ws.artifact.zip.cache.internal.ZipCachingServiceImpl");
+nullClasses.add("com.ibm.ws.bytebuffer.internal.ByteBufferConfiguration");
+nullClasses.add("com.ibm.ws.cdi.config.liberty.CDI12ContainerConfig");
+nullClasses.add("com.ibm.ws.cdi.liberty.CDIDeferredMetaDataFactoryImpl");
+nullClasses.add("com.ibm.ws.cdi.web.impl.el.WrappedELExpressionFactory");
+nullClasses.add("com.ibm.ws.cdi.web.liberty.WeldConfiguratorHelperFactory");
+nullClasses.add("com.ibm.ws.cdi.web.liberty.WeldServletInitializer");
+nullClasses.add("com.ibm.ws.classloading.configuration.GlobalClassloadingConfiguration");
+nullClasses.add("com.ibm.ws.classloading.internal.ApplicationClassloadingServiceFactory");
+nullClasses.add("com.ibm.ws.classloading.internal.ClassLoadingButlerAdapter");
+nullClasses.add("com.ibm.ws.classloading.internal.ClassLoadingServiceImpl");
+nullClasses.add("com.ibm.ws.classloading.internal.NativeLibraryAdapter");
+nullClasses.add("com.ibm.ws.classloading.java2sec.PermissionManager");
+nullClasses.add("com.ibm.ws.collector.manager.internal.CollectorManagerImpl");
+nullClasses.add("com.ibm.ws.config.xml.internal.ConfigIntrospection");
+nullClasses.add("com.ibm.ws.container.service.app.deploy.internal.WebModuleClassesInfoAdapter");
+nullClasses.add("com.ibm.ws.container.service.config.internal.WebFragmentsInfoAdapter");
+nullClasses.add("com.ibm.ws.container.service.metadata.internal.J2EENameFactoryImpl");
+nullClasses.add("com.ibm.ws.container.service.naming.RemoteObjectInstanceFactoryImpl");
+nullClasses.add("com.ibm.ws.crypto.util.VariableResolver");
+nullClasses.add("com.ibm.ws.cxf.client.component.AsyncClientRunnableWrapperManager");
+nullClasses.add("com.ibm.ws.event.internal.EventEngineImpl");
+nullClasses.add("com.ibm.ws.event.internal.ScheduledEventServiceImpl");
+nullClasses.add("com.ibm.ws.event.internal.WorkStageExecutorServiceFactory");
+nullClasses.add("com.ibm.ws.http.dispatcher.internal.HttpDispatcher");
+nullClasses.add("com.ibm.ws.http.internal.DefaultMimeTypesImpl");
+nullClasses.add("com.ibm.ws.http.internal.DefaultWelcomePage");
+nullClasses.add("com.ibm.ws.http.internal.EncodingUtilsImpl");
+nullClasses.add("com.ibm.ws.http.internal.HttpEndpointImpl");
+nullClasses.add("com.ibm.ws.http.internal.VirtualHostImpl");
+nullClasses.add("com.ibm.ws.javaee.ddmodel.managedbean.ManagedBeanBndAdapter");
+nullClasses.add("com.ibm.ws.javaee.ddmodel.permissions.PermissionsAdapter");
+nullClasses.add("com.ibm.ws.javaee.ddmodel.web.WebAppAdapter");
+nullClasses.add("com.ibm.ws.javaee.ddmodel.webbnd.WebBndAdapter");
+nullClasses.add("com.ibm.ws.javaee.ddmodel.webext.WebExtAdapter");
+nullClasses.add("com.ibm.ws.jaxrs20.cdi.component.JaxRsFactoryImplicitBeanCDICustomizer");
+nullClasses.add("com.ibm.ws.jaxrs20.client.component.JaxRsAppSecurity");
+nullClasses.add("com.ibm.ws.jaxrs20.component.Jaxrs20GlobalHandlerServiceImpl");
+nullClasses.add("com.ibm.ws.jaxrs20.component.LibertySseFeature");
+nullClasses.add("com.ibm.ws.jaxrs20.providers.customexceptionmapper.CustomExceptionMapperRegister");
+nullClasses.add("com.ibm.ws.jaxrs20.providers.security.SecurityAnnoProviderRegister");
+nullClasses.add("com.ibm.ws.jaxrs20.server.component.JaxRsBeanValidation");
+nullClasses.add("com.ibm.ws.jaxrs20.web.JaxRsInjectionClassListCollaborator");
+nullClasses.add("com.ibm.ws.jndi.internal.WASInitialContextFactoryBuilder");
+nullClasses.add("com.ibm.ws.jndi.url.contexts.javacolon.internal.JavaColonNameService");
+nullClasses.add("java.olon.internal.JavaColonNameService");
+nullClasses.add("com.ibm.ws.kernel.feature.internal.FeatureManager");
+nullClasses.add("com.ibm.ws.kernel.filemonitor.internal.CoreServiceImpl");
+nullClasses.add("com.ibm.ws.kernel.filemonitor.internal.FileNotificationImpl");
+nullClasses.add("com.ibm.ws.kernel.filemonitor.internal.scan.ScanningCoreServiceImpl");
+nullClasses.add("com.ibm.ws.kernel.server.internal.ServerEndpointControlMBeanImpl");
+nullClasses.add("com.ibm.ws.kernel.server.internal.ServerInfoMBeanImpl");
+nullClasses.add("com.ibm.ws.library.internal.SharedLibraryFactory");
+nullClasses.add("com.ibm.ws.logging.internal.osgi.FFDCJanitor");
+nullClasses.add("com.ibm.ws.managedobject.internal.ManagedObjectServiceImpl");
+nullClasses.add("com.ibm.ws.resource.internal.ResourceFactoryTracker");
+nullClasses.add("com.ibm.ws.resource.internal.ResourceRefConfigFactoryImpl");
+nullClasses.add("com.ibm.ws.runtime.update.internal.RuntimeUpdateManagerImpl");
+nullClasses.add("com.ibm.ws.runtime.update.internal.RuntimeUpdateNotificationMBeanImpl");
+nullClasses.add("com.ibm.ws.threading.PolicyExecutorProvider");
+nullClasses.add("com.ibm.ws.threading.internal.DeferrableScheduledExecutorImpl");
+nullClasses.add("com.ibm.ws.threading.internal.ExecutorServiceImpl");
+nullClasses.add("com.ibm.ws.threading.internal.FutureMonitorImpl");
+nullClasses.add("com.ibm.ws.threading.internal.ScheduledExecutorImpl");
+nullClasses.add("com.ibm.ws.threading.internal.ThreadingIntrospector");
+nullClasses.add("com.ibm.ws.timer.internal.QuickApproxTimeImpl");
+nullClasses.add("com.ibm.ws.transaction.services.TMRecoveryService");
+nullClasses.add("com.ibm.ws.transaction.services.TransactionManagerService");
+nullClasses.add("com.ibm.ws.transaction.services.TransactionObjectFactoryInfo");
+nullClasses.add("com.ibm.ws.transaction.services.TransactionSynchronizationRegistryObjectFactoryInfo");
+nullClasses.add("com.ibm.ws.transaction.services.UOWManagerObjectFactoryInfo");
+nullClasses.add("com.ibm.ws.transaction.services.UserTransactionService");
+nullClasses.add("com.ibm.ws.transport.http.welcome.page.WebSphereWelcomePage");
+nullClasses.add("com.ibm.ws.webcontainer.cors.CorsHelper");
+nullClasses.add("com.ibm.ws.webcontainer.cors.CorsRequestInterceptor");
+nullClasses.add("com.ibm.ws.webcontainer.osgi.WebContainer");
+nullClasses.add("com.ibm.ws.webcontainer.osgi.mbeans.GeneratePluginConfigMBean");
+nullClasses.add("com.ibm.ws.webcontainer.osgi.session.SessionHelper");
+nullClasses.add("com.ibm.ws.webcontainer31.util.ServletInjectionClassListCollaborator");
+nullClasses.add("com.ibm.ws.webcontainer40.async.factory.AsyncContextFactory40Impl");
+nullClasses.add("com.ibm.ws.webcontainer40.osgi.container.config.factory.WebAppConfiguratorFactory40Impl");
+nullClasses.add("com.ibm.ws.webcontainer40.osgi.response.factory.IRequestResponseFactory40Impl");
+nullClasses.add("com.ibm.ws.webcontainer40.osgi.srt.factory.SRTConnectionContextPool40Impl");
+nullClasses.add("com.ibm.ws.webcontainer40.osgi.webapp.factory.WebAppFactory40Impl");
+nullClasses.add("com.ibm.ws.webcontainer40.servlet.factory.CacheServletWrapperFactory40Impl");
+nullClasses.add("com.ibm.ws.webcontainer40.session.impl.factory.SessionContextRegistryImplFactory40Impl");
+nullClasses.add("com.ibm.ws.webserver.plugin.runtime.collaborators.GenPluginConfigCollaborator");
+nullClasses.add("com.ibm.ws.webserver.plugin.runtime.listeners.GeneratePluginConfigListener");
+nullClasses.add("com.ibm.ws.webserver.plugin.runtime.requester.PluginConfigRequesterImpl");
+nullClasses.add("com.ibm.wsspi.channelfw.ChannelConfiguration");
+nullClasses.add("com.ibm.wsspi.classloading.ResourceProvider");
+nullClasses.add("com.ibm.wsspi.config.internal.FilesetImpl");
+nullClasses.add("com.ibm.wsspi.injectionengine.ObjectFactoryInfo");
+nullClasses.add("com.ibm.wsspi.webcontainer.webapp.WebAppConfigAdapter");
+nullClasses.add("com.ibm.wsspi.webcontainer40.util.factory.URIMatcherFactory40Impl");
+nullClasses.add("java.lang.Object");
+nullClasses.add("java.net.URLStreamHandler");
+nullClasses.add("java.util.concurrent.AbstractExecutorService");
+nullClasses.add("java.util.concurrent.ScheduledThreadPoolExecutor");
+nullClasses.add("java.util.concurrent.ThreadPoolExecutor");
+nullClasses.add("javax.el.ExpressionFactory");
+nullClasses.add("javax.json.bind.spi.JsonbProvider");
+nullClasses.add("javax.json.spi.JsonProvider");
+nullClasses.add("javax.management.StandardEmitterMBean");
+nullClasses.add("javax.management.StandardMBean");
+nullClasses.add("org.eclipse.yasson.JsonBindingProvider");
+nullClasses.add("org.glassfish.json.JsonProviderImpl");
+nullClasses.add("org.osgi.service.url.AbstractURLStreamHandlerService");
+
+    }
 
     public ActivateMethod( final String methodName,
             final boolean methodRequired,
@@ -65,14 +277,20 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
 
         boolean suitableMethodNotAccessible = false;
 
+        String className = targetClass.getName();
         try
         {
-            // find the declared method in this class
-            final Method method = getMethod( targetClass, getMethodName(), new Class[]
-                { ClassUtils.COMPONENT_CONTEXT_CLASS }, acceptPrivate, acceptPackage, logger );
-            if ( method != null )
-            {
-                return new MethodInfo<>(method);
+            if (!nullClasses.contains(className)) {
+                // find the declared method in this class
+                final Method method = getMethod( targetClass, getMethodName(), new Class[]
+                    { ClassUtils.COMPONENT_CONTEXT_CLASS }, acceptPrivate, acceptPackage, logger );
+                if ( method != null )
+                {
+                    //System.out.println("***JTD: getMethod not null for " + targetClass + " returning " + method);
+                    return new MethodInfo<>(method);
+                } else {
+                    //System.out.println("***JTD: getMethod for " + targetClass + " returning NULL");
+                }
             }
         }
         catch ( SuitableMethodNotAccessibleException thrown )
@@ -82,6 +300,16 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
         }
         if (getDSVersion().isDS11())
         {
+            //System.out.println("***JTD: targetClass.toString " + className + ".");
+            if (sortedNullClasses.contains(className)) {
+                //System.out.println("***JTD: returning null for  " + targetClass);
+                return null;
+            }
+            if (classToMethodInfo.containsKey(targetClass)) {
+                //System.out.println("***JTD: returning cached version " + targetClass);
+                return classToMethodInfo.get(targetClass);
+            }
+            //System.out.println("***JTD: calling getSortedMethods for " + targetClass);
             List<Method> methods = getSortedMethods( targetClass);
             for (Method m: methods)
             {
@@ -94,7 +322,10 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
                     {
                         if ( accept( m, acceptPrivate, acceptPackage, returnValue() ) )
                         {
-                            return new MethodInfo<>(m);
+                            MethodInfo mi = new MethodInfo<>(m);
+                            //System.out.println("***JTD: putting1 " + targetClass + ", " + m);
+                            classToMethodInfo.put(targetClass, mi);
+                            return mi;
                         }
                         suitableMethodNotAccessible = true;
                     }
@@ -102,7 +333,10 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
                     {
                         if ( accept( m, acceptPrivate, acceptPackage, returnValue() ) )
                         {
-                            return new MethodInfo<>(m);
+                            MethodInfo mi = new MethodInfo<>(m);
+                            //System.out.println("***JTD: putting2 " + targetClass + ", " + m);
+                            classToMethodInfo.put(targetClass, mi);
+                            return mi;
                         }
                         suitableMethodNotAccessible = true;
                     }
@@ -110,7 +344,10 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
                     {
                         if ( accept( m, acceptPrivate, acceptPackage, returnValue() ) )
                         {
-                            return new MethodInfo<>(m);
+                            MethodInfo mi = new MethodInfo<>(m);
+                            //System.out.println("***JTD: putting3 " + targetClass + ", " + m);
+                            classToMethodInfo.put(targetClass, mi);
+                            return mi;
                         }
                         suitableMethodNotAccessible = true;
                     }
@@ -118,7 +355,10 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
                     {
                         if ( accept( m, acceptPrivate, acceptPackage, returnValue() ) )
                         {
-                            return new MethodInfo<>(m);
+                            MethodInfo mi = new MethodInfo<>(m);
+                            //System.out.println("***JTD: putting4 " + targetClass + ", " + m);
+                            classToMethodInfo.put(targetClass, mi);
+                            return mi;
                         }
                         suitableMethodNotAccessible = true;
                     }
@@ -126,7 +366,10 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
                     {
                         if ( accept( m, acceptPrivate, acceptPackage, returnValue() ) )
                         {
-                            return new MethodInfo<>(m);
+                            MethodInfo mi = new MethodInfo<>(m);
+                            //System.out.println("***JTD: putting5 " + targetClass + ", " + m);
+                            classToMethodInfo.put(targetClass, mi);
+                            return mi;
                         }
                         suitableMethodNotAccessible = true;
                     }
@@ -152,7 +395,10 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
                     {
                         if ( accept( m, acceptPrivate, acceptPackage, returnValue() ) )
                         {
-                            return new MethodInfo<>(m);
+                            MethodInfo mi = new MethodInfo<>(m);
+                            //System.out.println("***JTD: putting6 " + targetClass + ", " + m);
+                            classToMethodInfo.put(targetClass, mi);
+                            return mi;
                         }
                         suitableMethodNotAccessible = true;
                     }
@@ -162,19 +408,23 @@ public class ActivateMethod extends BaseMethod<ActivatorParameter, Object> imple
                 {
                     if ( accept( m, acceptPrivate, acceptPackage, returnValue() ) )
                     {
-                        return new MethodInfo<>(m);
+                            MethodInfo mi = new MethodInfo<>(m);
+                            //System.out.println("***JTD: putting7 " + targetClass + ", " + m);
+                            classToMethodInfo.put(targetClass, mi);
+                            return mi;
                     }
                     suitableMethodNotAccessible = true;
                 }
 
             }
+            //System.out.println("***JTD: adding null for " + targetClass);
+            classToMethodInfo.put(targetClass, null); 
         }
 
         if ( suitableMethodNotAccessible )
         {
             throw new SuitableMethodNotAccessibleException();
         }
-
         return null;
     }
 
